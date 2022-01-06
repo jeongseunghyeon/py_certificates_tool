@@ -1,8 +1,8 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QToolTip, QMainWindow, QAction, qApp, QDesktopWidget
-from PyQt5.QtWidgets import QLabel, QGridLayout, QLineEdit, QTextEdit, QFileDialog, QPushButton
+from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QMainWindow, QAction, qApp, QDesktopWidget
+from PyQt5.QtWidgets import QLabel, QGridLayout, QLineEdit, QTextEdit, QFileDialog, QPushButton, QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtCore import QCoreApplication, QDateTime
+from PyQt5.QtCore import QCoreApplication, QDateTime, QTimer
 
 
 class CertificateToolView(QMainWindow):
@@ -10,6 +10,7 @@ class CertificateToolView(QMainWindow):
         super().__init__()
 
         # UI Component Init
+        self.create_csr_btn = QPushButton('Create CSR')
         self.crt_path = QLineEdit()
         self.key_path = QLineEdit()
         self.chain1_path = QLineEdit()
@@ -18,21 +19,30 @@ class CertificateToolView(QMainWindow):
         self.cert_contents = QTextEdit()
 
         self.datetime = QDateTime.currentDateTime()
+        self.datetime_label = ''
         self.init_ui()
 
     def init_ui(self):
-        # self.init_menu_bar()
-        self.init_input_interface()
+        self.init_menu_bar()
+        self.init_widget()
 
         # Status Bar #
-        self.statusBar().showMessage('Created by jsh152169')
+        self.set_current_time()
+        qtimer = QTimer(self)
+        qtimer.timeout.connect(self.set_current_time)
+        qtimer.start(1000)
 
         # Window #
-        self.setWindowTitle('Certificate Tool')
+        self.setWindowTitle('Certificate Tool(Created by jsh152169@gmail.com)')
         self.resize(700, 600)
         self.move_to_center()
         self.setWindowIcon(QIcon('./image/icon.png'))
         self.show()
+
+    def set_current_time(self):
+        qdate = QDateTime.currentDateTime()
+        self.datetime_label = qdate.toString('yyyy-MM-dd HH:mm:ss')
+        self.statusBar().showMessage(self.datetime_label)
 
     def init_menu_bar(self):
         # Top Menu Init #
@@ -47,18 +57,21 @@ class CertificateToolView(QMainWindow):
         file_menu.addAction(exit_action)
         return
 
-    def init_input_interface(self):
+    def init_widget(self):
         self.setCentralWidget(QWidget())
         cw = self.centralWidget()
+
         grid = QGridLayout()
         cw.setLayout(grid)
 
-        grid.addWidget(QLabel('crt file : '), 0, 0)
-        grid.addWidget(QLabel('key file : '), 1, 0)
-        grid.addWidget(QLabel('chain1 file : '), 2, 0)
-        grid.addWidget(QLabel('chain2 file : '), 3, 0)
-        grid.addWidget(QLabel('root ca file : '), 4, 0)
-        grid.addWidget(QLabel('Content : '), 5, 0)
+        grid.addWidget(self.create_csr_btn, 0, 0, 1, 3)
+
+        grid.addWidget(QLabel('crt file : '), 1, 0)
+        grid.addWidget(QLabel('key file : '), 2, 0)
+        grid.addWidget(QLabel('chain1 file : '), 3, 0)
+        grid.addWidget(QLabel('chain2 file : '), 4, 0)
+        grid.addWidget(QLabel('root ca file : '), 5, 0)
+        grid.addWidget(QLabel('Content : '), 6, 0)
 
         self.crt_path.setReadOnly(True)
         self.key_path.setReadOnly(True)
@@ -66,17 +79,16 @@ class CertificateToolView(QMainWindow):
         self.chain2_path.setReadOnly(True)
         self.rootca_path.setReadOnly(True)
         self.cert_contents.setReadOnly(True)
-        grid.addWidget(self.crt_path, 0, 1)
-        grid.addWidget(self.key_path, 1, 1)
-        grid.addWidget(self.chain1_path, 2, 1)
-        grid.addWidget(self.chain2_path, 3, 1)
-        grid.addWidget(self.rootca_path, 4, 1)
-        grid.addWidget(self.cert_contents, 5, 1)
+
+        grid.addWidget(self.crt_path, 1, 1)
+        grid.addWidget(self.key_path, 2, 1)
+        grid.addWidget(self.chain1_path, 3, 1)
+        grid.addWidget(self.chain2_path, 4, 1)
+        grid.addWidget(self.rootca_path, 5, 1)
+        grid.addWidget(self.cert_contents, 6, 1)
 
         crt_file_btn = QPushButton('File Open', self)
         crt_file_btn.clicked.connect(self.onclick_crt_file_open_btn)
-        # crt_file_show_btn = QPushButton('Show', self)
-        # crt_file_show_btn.resize(crt_file_show_btn.sizeHint())
 
         key_file_btn = QPushButton('File Open', self)
         key_file_btn.clicked.connect(self.onclick_key_file_open_btn)
@@ -87,12 +99,11 @@ class CertificateToolView(QMainWindow):
         rootca_file_btn = QPushButton('File Open', self)
         rootca_file_btn.resize(crt_file_btn.sizeHint())
 
-        grid.addWidget(crt_file_btn, 0, 2)
-        # grid.addWidget(crt_file_show_btn, 0, 3)
-        grid.addWidget(key_file_btn, 1, 2)
-        grid.addWidget(chain1_file_btn, 2, 2)
-        grid.addWidget(chain2_file_btn, 3, 2)
-        grid.addWidget(rootca_file_btn, 4, 2)
+        grid.addWidget(crt_file_btn, 1, 2)
+        grid.addWidget(key_file_btn, 2, 2)
+        grid.addWidget(chain1_file_btn, 3, 2)
+        grid.addWidget(chain2_file_btn, 4, 2)
+        grid.addWidget(rootca_file_btn, 5, 2)
 
         return
 
@@ -125,3 +136,4 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = CertificateToolView()
     sys.exit(app.exec_())
+
