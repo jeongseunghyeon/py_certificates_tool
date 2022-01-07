@@ -1,7 +1,10 @@
 import sys
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QCoreApplication, QDateTime, QTimer
+
+
 
 
 class MainView(QMainWindow):
