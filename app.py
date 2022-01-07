@@ -154,6 +154,7 @@ class CreateCSRView(QDialog):
 
         # Init Component
         self.country_name = QLineEdit()
+        self.country_name.setMaxLength(2)
         self.state_name = QLineEdit()
         self.locality_name = QLineEdit()
         self.org_name = QLineEdit()
