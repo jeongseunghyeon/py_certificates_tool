@@ -9,4 +9,4 @@
    - python app.py
 
 2. Build
-   - pyinstall -w (--onefile) app.py
+   - pyinstaller -w (--onefile) app.py
