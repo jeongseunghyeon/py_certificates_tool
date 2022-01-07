@@ -8,6 +8,7 @@ from OpenSSL.crypto import (
     X509,
     X509Req
 )
+import os
 import random
 
 
@@ -28,13 +29,19 @@ class OpenSSLLib:
     def get_privatekey_dump(self, passphrase: str) -> str:
         assert passphrase, 'Empty Pass phrase'
 
-        return dump_privatekey(type=FILETYPE_PEM, pkey=self._pk, cipher='aes-256-cbc', passphrase=passphrase).decode('utf-8')
+        return dump_privatekey(type=FILETYPE_PEM, pkey=self._pk, cipher='aes-256-cbc',
+                               passphrase=passphrase.encode('utf-8')).decode('utf-8')
 
     def save_privatekey_pem(self, filename: str, passphrase: str):
         assert filename, 'Empty Filename'
         assert passphrase, 'Empty Pass phrase'
 
-        fp = open(f'certs/{filename}', 'w', encoding='utf-8')
+        try:
+            fp = open(file=f'certs/{filename}', mode='w', encoding='utf-8')
+        except FileNotFoundError:
+            os.makedirs('certs')
+            fp = open(file=f'certs/{filename}', mode='w', encoding='utf-8')
+
         fp.write(self.get_privatekey_dump(passphrase=passphrase))
         fp.close()
 
@@ -54,7 +61,12 @@ class OpenSSLLib:
     def save_csr_pem(self, filename: str):
         assert filename, 'Empty Filename'
 
-        fp = open(f'certs/{filename}', 'w', encoding='utf-8')
+        try:
+            fp = open(file=f'certs/{filename}', mode='w', encoding='utf-8')
+        except FileNotFoundError:
+            os.makedirs('certs')
+            fp = open(file=f'certs/{filename}', mode='w', encoding='utf-8')
+
         fp.write(self.get_csr_dump())
         fp.close()
 
@@ -63,7 +75,7 @@ class OpenSSLLib:
 
         self._x509.set_serial_number(random.randint(10 ** 8, 10 ** 9))
 
-        # Set Certificates ExpireDate
+        # Set Certificates Period
         self._x509.gmtime_adj_notBefore(0)
         self._x509.gmtime_adj_notAfter(60 * 60 * 24 * period_day)
 
@@ -71,7 +83,7 @@ class OpenSSLLib:
         self._x509.set_subject(self._x509_request.get_subject())
         self._x509.set_issuer(self._x509.get_subject())
         self._x509.set_pubkey(self._x509_request.get_pubkey())
-        self._x509.sign(self._pk, "sha256")
+        self._x509.sign(pkey=self._pk, digest="sha256".encode('utf-8'))
 
     def get_certificates_dump(self) -> str:
         return dump_certificate(type=FILETYPE_PEM, cert=self._x509).decode('utf-8')
@@ -79,6 +91,11 @@ class OpenSSLLib:
     def save_certificates_pem(self, filename: str):
         assert filename, 'Empty Filename'
 
-        fp = open(f'certs/{filename}', 'w', encoding='utf-8')
+        try:
+            fp = open(file=f'certs/{filename}', mode='w', encoding='utf-8')
+        except FileNotFoundError:
+            os.makedirs('certs')
+            fp = open(file=f'certs/{filename}', mode='w', encoding='utf-8')
+
         fp.write(self.get_certificates_dump())
         fp.close()
