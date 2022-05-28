@@ -3,7 +3,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QDateTime, QTimer
 
 # from openssl_lib import OpenSSLLib
-from .set_csr_view import SetCSRView
+from .set_csr import SetCSRView
 
 
 class CSRData:
@@ -22,11 +22,9 @@ class MainView(QMainWindow):
         super().__init__()
 
         # UI Component Init
+        self.pfx_path = QLineEdit()
         self.crt_path = QLineEdit()
         self.key_path = QLineEdit()
-        self.chain1_path = QLineEdit()
-        self.chain2_path = QLineEdit()
-        self.rootca_path = QLineEdit()
         self.cert_contents = QTextEdit()
 
         # Variable
@@ -80,44 +78,31 @@ class MainView(QMainWindow):
 
         grid.addWidget(self.create_csr_group_layout(), 0, 0, 1, 6)
 
-        grid.addWidget(QLabel('crt file : '), 1, 0, 1, 1)
-        grid.addWidget(QLabel('key file : '), 2, 0, 1, 1)
-        grid.addWidget(QLabel('chain1 file : '), 3, 0, 1, 1)
-        grid.addWidget(QLabel('chain2 file : '), 4, 0, 1, 1)
-        grid.addWidget(QLabel('root ca file : '), 5, 0, 1, 1)
-        grid.addWidget(QLabel('Content : '), 6, 0, 1, 1)
+        grid.addWidget(QLabel('PFX file : '), 1, 0, 1, 1)
+        grid.addWidget(QLabel('Crt file : '), 2, 0, 1, 1)
+        grid.addWidget(QLabel('Key file : '), 3, 0, 1, 1)
+        grid.addWidget(QLabel('Content : '), 4, 0, 1, 1)
 
+        self.pfx_path.setReadOnly(True)
         self.crt_path.setReadOnly(True)
         self.key_path.setReadOnly(True)
-        self.chain1_path.setReadOnly(True)
-        self.chain2_path.setReadOnly(True)
-        self.rootca_path.setReadOnly(True)
         self.cert_contents.setReadOnly(True)
 
-        grid.addWidget(self.crt_path, 1, 1, 1, 4)
-        grid.addWidget(self.key_path, 2, 1, 1, 4)
-        grid.addWidget(self.chain1_path, 3, 1, 1, 4)
-        grid.addWidget(self.chain2_path, 4, 1, 1, 4)
-        grid.addWidget(self.rootca_path, 5, 1, 1, 4)
+        grid.addWidget(self.pfx_path, 1, 1, 1, 4)
+        grid.addWidget(self.crt_path, 2, 1, 1, 4)
+        grid.addWidget(self.key_path, 3, 1, 1, 4)
         grid.addWidget(self.cert_contents, 6, 1, 1, 4)
 
-        crt_file_btn = QPushButton('File Open', self)
+        pfx_file_btn = QPushButton('File Select', self)
+        pfx_file_btn.clicked.connect(self.onclick_crt_file_open_btn)
+        crt_file_btn = QPushButton('File Select', self)
         crt_file_btn.clicked.connect(self.onclick_crt_file_open_btn)
-
-        key_file_btn = QPushButton('File Open', self)
+        key_file_btn = QPushButton('File Select', self)
         key_file_btn.clicked.connect(self.onclick_key_file_open_btn)
-        chain1_file_btn = QPushButton('File Open', self)
-        chain1_file_btn.resize(crt_file_btn.sizeHint())
-        chain2_file_btn = QPushButton('File Open', self)
-        chain2_file_btn.resize(crt_file_btn.sizeHint())
-        rootca_file_btn = QPushButton('File Open', self)
-        rootca_file_btn.resize(crt_file_btn.sizeHint())
 
-        grid.addWidget(crt_file_btn, 1, 5, 1, 1)
-        grid.addWidget(key_file_btn, 2, 5, 1, 1)
-        grid.addWidget(chain1_file_btn, 3, 5, 1, 1)
-        grid.addWidget(chain2_file_btn, 4, 5, 1, 1)
-        grid.addWidget(rootca_file_btn, 5, 5, 1, 1)
+        grid.addWidget(pfx_file_btn, 1, 5, 1, 1)
+        grid.addWidget(crt_file_btn, 2, 5, 1, 1)
+        grid.addWidget(key_file_btn, 3, 5, 1, 1)
 
         return
 
@@ -135,7 +120,6 @@ class MainView(QMainWindow):
         groupbox.setLayout(hbox)
 
         return groupbox
-
 
     def move_to_center(self):
         qr = self.frameGeometry()

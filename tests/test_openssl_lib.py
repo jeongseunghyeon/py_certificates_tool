@@ -1,4 +1,4 @@
-from src.openssl_lib import OpenSSLLib
+from src.libs.openssl_lib import OpenSSLLib
 
 if __name__ == '__main__':
     osl = OpenSSLLib()

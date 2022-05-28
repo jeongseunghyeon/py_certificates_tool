@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication
 import sys
 
-from views.main_view import MainView
+from views.main import MainView
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
